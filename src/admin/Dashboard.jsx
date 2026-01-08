@@ -20,7 +20,7 @@ import SacramentsForm from './Sacraments';
 import AnnouncementsForm from './Announcements';
 import AdvertisingContactForm from './AdsInfo';
 import { AdsImg } from './AdminCustomes';
-import FirstBible from './firstBible';
+import FirstBible from './FirstBible';
 import PastorsConfig from './PastorsConfig';
 import ParishCouncilConfigs from './ParishCouncilConfigs';
 import FormConfigs from './FormConfigs';
