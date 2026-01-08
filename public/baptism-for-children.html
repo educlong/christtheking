@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Infant / Child Baptism Application</title>
+    <style>
+      body {
+        font-family: 'Times New Roman', serif;
+        width: 800px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+
+      .center {
+        text-align: center;
+      }
+
+      /* Tạo một container để chứa dấu thập và text */
+      .header-wrapper {
+        display: flex;
+        align-items: flex-start; /* Căn dấu thập lên phía trên chữ */
+        margin-top: 30px;
+        justify-content: center;
+      }
+
+      .cross {
+        font-size: 60px; /* Tăng kích thước dấu thập */
+        margin-right: 15px; /* Khoảng cách từ dấu thập đến chữ */
+        margin-top: -12px; /* Điều chỉnh chiều cao dấu thập */
+      }
+
+      .header-text {
+        text-align: left;
+        line-height: 1.2;
+        margin-top: 12px;
+      }
+
+      .header-text .line1 {
+        font-size: 22px;
+        font-weight: bold;
+      }
+
+      .header-text .line2 {
+        font-size: 17px;
+        font-weight: bold;
+        margin-top: 6px;
+      }
+
+      /* Chỉnh sửa đường kẻ */
+      hr {
+        margin-top: 30px;
+        margin-bottom: 10px;
+        border: none;
+        border-top: 1px solid black;
+      }
+
+      /* Các dòng có gạch chân */
+      .line {
+        display: inline-block;
+        border-bottom: 1px solid black;
+        vertical-align: middle;
+        margin-left: 5px;
+      }
+
+      .line-small {
+        display: inline-block;
+        border-bottom: 1px solid black;
+        vertical-align: middle;
+        margin-left: 5px;
+      }
+
+      .line-medium {
+        display: inline-block;
+        border-bottom: 1px solid black;
+        vertical-align: middle;
+        margin-left: 5px;
+      }
+
+      .section {
+        margin-top: 20px;
+      }
+
+      /* Điều chỉnh vị trí các phần nhập liệu để chúng không bị tràn */
+      .section input {
+        border: none;
+        border-bottom: 1px solid black;
+        width: 500px;
+        margin-left: 5px;
+      }
+
+      .section-small input {
+        width: 150px;
+      }
+
+      .section-medium input {
+        width: 250px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Cross + Header -->
+    <div class="header-wrapper">
+      <div class="cross">✝</div>
+      <div class="header-text">
+        <div class="line1">CHRIST THE KING</div>
+        <div class="line2">Roman Catholic Parish</div>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="center" style="font-size: 17px; font-weight: bold">
+      Christ The King (Claresholm)
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      St. Cecilia (Nanton)
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      St. Mary’s (Champion)
+    </div>
+    <div class="center" style="font-size: 15px">
+      &nbsp;&nbsp;&nbsp;&nbsp;344 50 Ave W, Claresholm, AB T0L 0T0
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2308 19 St, Nanton,
+      AB T0L 1R0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 229 3 Ave, Champion,
+      AB T0L 0R0
+    </div>
+
+    <!-- Title -->
+    <div
+      class="center"
+      style="font-size: 24px; font-weight: bold; margin-top: 40px"
+    >
+      CHILDREN BAPTISM APPLICATION
+    </div>
+
+    <!-- Fields -->
+    <div class="section">
+      Baptismal Name of Child: <span class="line" style="width: 600px"></span>
+    </div>
+
+    <div class="section">
+      Full Name of Child: <span class="line" style="width: 635px"></span>
+    </div>
+
+    <div class="section">
+      Date of Birth (Day / Month / Year)
+      <span class="line-small" style="width: 550px"></span>
+    </div>
+
+    <div class="section">
+      Place of Birth: (City/Town)
+      <span class="line-medium" style="width: 300px"></span> (Province/State)
+      <span class="line-medium" style="width: 180px"></span>
+    </div>
+
+    <div class="section">
+      Father (Baptismal Name, Given Name)
+      <span class="line" style="width: 520px"></span>
+    </div>
+
+    <div class="section">
+      Mother (Baptismal Name, Given Name)
+      <span class="line" style="width: 517px"></span>
+    </div>
+
+    <div class="section">
+      Are the parents married in the church?
+      <span class="line" style="width: 530px"></span>
+    </div>
+    <div class="section">
+      Parents’ Address <span class="line" style="width: 665px"></span>
+    </div>
+
+    <div class="section">
+      Phone Number: <span class="line-small" style="width: 670px"></span>
+    </div>
+
+    <div class="section">
+      Are you registered parishioners?
+      <span class="line-small" style="width: 150px"></span> Envelope /
+      Registration No. <span class="line-small" style="width: 230px"></span>
+    </div>
+
+    <div class="section" style="font-style: italic; margin-top: 10px">
+      (The church baptizes only children of registered parish families)
+    </div>
+
+    <div class="section">
+      Godparent(s) (Baptismal Name, Given Name) of Child
+      <span class="line" style="width: 430px"></span>
+    </div>
+    <div class="section" style="margin-top: 40px">
+      Requested month and year for Baptism:
+      <span class="line-small" style="width: 100px"></span> / 20
+      <span class="line-small" style="width: 50px"></span>
+    </div>
+
+    <div class="center" style="margin-top: 10px">Signature</div>
+  </body>
+</html>
