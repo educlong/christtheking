@@ -1,10 +1,9 @@
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  Stack,
   Typography,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Logos from './Logos';
@@ -115,6 +114,7 @@ export default function Dashboard({ auth, inits, posts, images }) {
     ];
   }, [parishersData]);
   const [showParishers, setShowParishers] = useState(false);
+  const [allowSendEmail, setAllowSendEmail] = useState(false);
   return (
     inits &&
     inits.length > 0 && (
@@ -281,6 +281,7 @@ export default function Dashboard({ auth, inits, posts, images }) {
                 notes="***Maximum 250 characters"
                 sendAnnouncement={sendAnnouncement}
                 emailsParishers={emailsParishers}
+                allowSendEmail={allowSendEmail}
               />
             </CustomDetails>
             <CustomDetails>
@@ -290,8 +291,23 @@ export default function Dashboard({ auth, inits, posts, images }) {
                 notes={'*File size must be 1.0 MB or smaller!'}
                 sendAnnouncement={sendAnnouncement}
                 emailsParishers={emailsParishers}
+                allowSendEmail={allowSendEmail}
               />
             </CustomDetails>
+
+            <CustomDetails>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={allowSendEmail}
+                    onChange={(e) => setAllowSendEmail(e.target.checked)}
+                    color="primary"
+                  />
+                }
+                label="Allow sending email notifications"
+              />
+            </CustomDetails>
+
             {pagesInit &&
               pagesInit.length > 0 &&
               pagesData &&
@@ -306,6 +322,7 @@ export default function Dashboard({ auth, inits, posts, images }) {
                     church={churchData}
                     sendAnnouncement={sendAnnouncement}
                     emailsParishers={emailsParishers}
+                    allowSendEmail={allowSendEmail}
                   />
                 </CustomDetails>
               )}

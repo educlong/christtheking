@@ -22,8 +22,8 @@ import {
 } from './AdminCustomes';
 import { useMemo } from 'react';
 import {
+  useCleanupOldPostImages,
   useDeletePost,
-  useUpdateAllPosts,
   useUpsertPost,
 } from '../server/PostsHandle';
 import { website } from '../Constain';
@@ -35,6 +35,7 @@ export default function PostConfigs({
   church,
   sendAnnouncement,
   emailsParishers,
+  allowSendEmail,
 }) {
   const churchOptions = [
     { label: 'All', value: -1 },
@@ -59,6 +60,7 @@ export default function PostConfigs({
   const { deletePost } = useDeletePost();
   const [posts, setPosts] = useState(_posts);
   const [editingIndex, setEditingIndex] = useState(null);
+  const { cleanupImages } = useCleanupOldPostImages();
   const handleChange = (index, field, value) => {
     setPosts((prev) =>
       prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
@@ -102,7 +104,7 @@ export default function PostConfigs({
   };
   const { handleImageUpload } = useImageBase64Upload({
     maxWidth: 2048,
-    quality: 0.1,
+    quality: 0,
     field: 'temp', // field giả, KHÔNG dùng trực tiếp
   });
   const handleAddPostImage = async (postIndex, file) => {
@@ -188,7 +190,7 @@ export default function PostConfigs({
       clone.link_id = isValidYouTubeId(possibleId) ? possibleId : null;
     }
     try {
-      if (!clone.id) {
+      if (!clone.id && allowSendEmail) {
         if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
           alert('No recipients selected. Email not sent.');
         } else {
@@ -224,40 +226,11 @@ ${website}
           .sort((a, b) => b.id - a.id) // id cao → mới
           .slice(0, 6);
   }, [posts, isAdmin]);
-  const { updateAllPosts } = useUpdateAllPosts();
+
   const handleRemoveOldImages = async () => {
-    const now = new Date();
-    const twoYearsAgo = new Date();
-    twoYearsAgo.setFullYear(now.getFullYear() - 2);
-
-    setPosts((prev) => {
-      if (!prev.length) return prev;
-      // Tìm năm đầu tiên
-      const firstYear = prev.reduce((minYear, post) => {
-        if (!post.time) return minYear;
-        const year = new Date(post.time).getFullYear();
-        return minYear === null || year < minYear ? year : minYear;
-      }, null);
-
-      return prev.map((post) => {
-        if (!post.time) return post;
-        const postTime = new Date(post.time);
-        const postYear = postTime.getFullYear();
-        // Giữ nguyên tất cả post trong năm đầu tiên
-        if (postYear === firstYear) return post;
-        // Remove images nếu post cũ hơn 2 năm
-        if (postTime < twoYearsAgo) {
-          return { ...post, images: [] };
-        }
-        return post; // giữ nguyên post còn lại
-      });
-    });
-    await updateAllPosts({
-      posts,
-      onSuccess: () => {
-        alert('Cập nhật tất cả bài viết thành công!');
-      },
-    });
+    if (!window.confirm('Xóa ảnh các bài viết cũ hơn 2 năm?')) return;
+    const result = await cleanupImages();
+    alert(`Đã dọn ảnh cho ${result.affectedRows} bài viết`);
     window.location.reload();
   };
 

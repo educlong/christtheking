@@ -9,6 +9,7 @@ const WeeklyBulletin = ({
   notes,
   sendAnnouncement,
   emailsParishers,
+  allowSendEmail,
 }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -39,13 +40,14 @@ const WeeklyBulletin = ({
   const handleUpload = async () => {
     if (!file) return;
     try {
-      if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
-        alert('No recipients selected. Email not sent.');
-      } else {
-        try {
-          await sendAnnouncement({
-            subject: bulletin,
-            message: `
+      if (allowSendEmail) {
+        if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
+          alert('No recipients selected. Email not sent.');
+        } else {
+          try {
+            await sendAnnouncement({
+              subject: bulletin,
+              message: `
     <p>
       <a href="${backend}pdf/bulletin" target="_blank" style="color: blue; text-decoration: underline;">
         ${file.name}
@@ -55,12 +57,13 @@ const WeeklyBulletin = ({
         ${website}
       </a></p>
   `,
-            emails: emailsParishers,
-            imgs: [],
-          });
-          alert('Emails sent successfully!');
-        } catch (err) {
-          console.error(err);
+              emails: emailsParishers,
+              imgs: [],
+            });
+            alert('Emails sent successfully!');
+          } catch (err) {
+            console.error(err);
+          }
         }
       }
     } finally {

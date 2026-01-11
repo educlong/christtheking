@@ -194,3 +194,35 @@ export const useUpdateAllPosts = () => {
   };
   return { updateAllPosts, data, loading, error };
 };
+
+export function useCleanupOldPostImages() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const cleanupImages = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${backend}posts/cleanup-images`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!res.ok) {
+        throw new Error('Cleanup failed');
+      }
+      const data = await res.json();
+      return data; // { success, affectedRows }
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+  return {
+    cleanupImages,
+    loading,
+    error,
+  };
+}

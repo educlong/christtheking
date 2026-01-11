@@ -10,6 +10,7 @@ export default function AnnouncementsForm({
   notes,
   sendAnnouncement,
   emailsParishers,
+  allowSendEmail,
 }) {
   const { upsertInits, loading } = useUpsertInits();
   const announcementInit = useMemo(
@@ -45,26 +46,28 @@ export default function AnnouncementsForm({
       expiryDate: expiryDate.toISOString(), // lưu vào DB
     };
     try {
-      if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
-        alert('No recipients selected. Email not sent.');
-      } else if (!payload?.message || payload.message.trim() === '') {
-        alert('Message content is empty. Email not sent.');
-      } else {
-        try {
-          await sendAnnouncement({
-            subject: payload.title,
-            message: `
+      if (allowSendEmail) {
+        if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
+          alert('No recipients selected. Email not sent.');
+        } else if (!payload?.message || payload.message.trim() === '') {
+          alert('Message content is empty. Email not sent.');
+        } else {
+          try {
+            await sendAnnouncement({
+              subject: payload.title,
+              message: `
                 ${payload.message}
                 <p>More details in: <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
                     ${website}
                   </a></p>
               `,
-            emails: emailsParishers,
-            imgs: [],
-          });
-          alert('Emails sent successfully!');
-        } catch (err) {
-          console.error(err);
+              emails: emailsParishers,
+              imgs: [],
+            });
+            alert('Emails sent successfully!');
+          } catch (err) {
+            console.error(err);
+          }
         }
       }
     } finally {
