@@ -1,5 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Button, Typography, LinearProgress } from '@mui/material';
+import {
+  Box,
+  Button,
+  Typography,
+  LinearProgress,
+  TextField,
+} from '@mui/material';
 import { handleUploadPdf } from '../server/InitsHandle';
 import { backend, typeBulletin, website } from '../Constain';
 
@@ -9,10 +15,10 @@ const WeeklyBulletin = ({
   notes,
   sendAnnouncement,
   emailsParishers,
-  allowSendEmail,
 }) => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [note, setNote] = useState('');
   const bulletinInit = useMemo(
     () => [inits.find((item) => item.type === typeBulletin)],
     [inits]
@@ -40,14 +46,14 @@ const WeeklyBulletin = ({
   const handleUpload = async () => {
     if (!file) return;
     try {
-      if (allowSendEmail) {
+      if (emailsParishers.length > 0) {
         if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
           alert('No recipients selected. Email not sent.');
         } else {
           try {
             await sendAnnouncement({
               subject: bulletin,
-              message: `
+              message: `<br />${note}<br /><br />
     <p>
       <a href="${backend}pdf/bulletin" target="_blank" style="color: blue; text-decoration: underline;">
         ${file.name}
@@ -107,6 +113,15 @@ const WeeklyBulletin = ({
           Selected file: {file.name}
         </Typography>
       )}
+      <TextField
+        label="Message"
+        fullWidth
+        multiline
+        minRows={3}
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        sx={{ mt: 2 }}
+      />
       <Box mt={2}>
         <Button
           variant="contained"

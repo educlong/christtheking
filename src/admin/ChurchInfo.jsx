@@ -21,7 +21,6 @@ export default function ChurchInfo({
   isAdmin,
   isMod,
   massInit,
-  emailsParishers,
 }) {
   const { upsertInits, loading } = useUpsertInits();
   /* ---------------- Parse DATA ---------------- */

@@ -10,7 +10,6 @@ export default function AnnouncementsForm({
   notes,
   sendAnnouncement,
   emailsParishers,
-  allowSendEmail,
 }) {
   const { upsertInits, loading } = useUpsertInits();
   const announcementInit = useMemo(
@@ -46,7 +45,7 @@ export default function AnnouncementsForm({
       expiryDate: expiryDate.toISOString(), // lưu vào DB
     };
     try {
-      if (allowSendEmail) {
+      if (emailsParishers.length > 0) {
         if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
           alert('No recipients selected. Email not sent.');
         } else if (!payload?.message || payload.message.trim() === '') {

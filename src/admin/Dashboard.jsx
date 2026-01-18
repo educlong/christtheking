@@ -105,16 +105,30 @@ export default function Dashboard({ auth, inits, posts, images }) {
     }
     return [];
   }, [pagesInit]);
-  const emailsParishers = useMemo(() => {
-    if (!parishersData?.listparishers) return [];
-    return [
-      ...new Set(
-        parishersData.listparishers.map((p) => p.email?.trim()).filter(Boolean)
-      ),
-    ];
+  const emailsByParishers = useMemo(() => {
+    if (!parishersData?.listparishers) return {};
+    return parishersData.listparishers.reduce((acc, p) => {
+      const parish = p.parish?.trim();
+      const email = p.email?.trim();
+      if (!parish || !email) return acc;
+      if (!acc[parish]) {
+        acc[parish] = new Set();
+      }
+      acc[parish].add(email);
+      return acc;
+    }, {});
   }, [parishersData]);
   const [showParishers, setShowParishers] = useState(false);
-  const [allowSendEmail, setAllowSendEmail] = useState(false);
+  const [selectedParishes, setSelectedParishes] = useState([]);
+  const selectedEmails = useMemo(() => {
+    return [
+      ...new Set(
+        selectedParishes.flatMap((parish) => [
+          ...(emailsByParishers[parish] || []),
+        ])
+      ),
+    ];
+  }, [selectedParishes, emailsByParishers]);
   return (
     inits &&
     inits.length > 0 && (
@@ -255,7 +269,6 @@ export default function Dashboard({ auth, inits, posts, images }) {
                   isAdmin={isAdmin}
                   isMod={isMod}
                   massInit={churchInit}
-                  emailsParishers={emailsParishers}
                 />
               </CustomDetails>
             )}
@@ -280,8 +293,8 @@ export default function Dashboard({ auth, inits, posts, images }) {
                 isAdmin={isAdmin}
                 notes="***Maximum 250 characters"
                 sendAnnouncement={sendAnnouncement}
-                emailsParishers={emailsParishers}
-                allowSendEmail={allowSendEmail}
+                emailsParishers={selectedEmails}
+                selectedParishes={selectedParishes}
               />
             </CustomDetails>
             <CustomDetails>
@@ -290,22 +303,31 @@ export default function Dashboard({ auth, inits, posts, images }) {
                 type={'bulletin'}
                 notes={'*File size must be 1.0 MB or smaller!'}
                 sendAnnouncement={sendAnnouncement}
-                emailsParishers={emailsParishers}
-                allowSendEmail={allowSendEmail}
+                emailsParishers={selectedEmails}
               />
             </CustomDetails>
-
             <CustomDetails>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={allowSendEmail}
-                    onChange={(e) => setAllowSendEmail(e.target.checked)}
-                    color="primary"
-                  />
-                }
-                label="Allow sending email notifications"
-              />
+              {Object.keys(emailsByParishers).map((parish) => (
+                <FormControlLabel
+                  key={parish}
+                  control={
+                    <Checkbox
+                      checked={selectedParishes.includes(parish)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedParishes((prev) => [...prev, parish]);
+                        } else {
+                          setSelectedParishes((prev) =>
+                            prev.filter((p) => p !== parish)
+                          );
+                        }
+                      }}
+                      color="primary"
+                    />
+                  }
+                  label={`Allow sending email for ${parish}`}
+                />
+              ))}
             </CustomDetails>
 
             {pagesInit &&
@@ -321,8 +343,7 @@ export default function Dashboard({ auth, inits, posts, images }) {
                     pages={pagesData}
                     church={churchData}
                     sendAnnouncement={sendAnnouncement}
-                    emailsParishers={emailsParishers}
-                    allowSendEmail={allowSendEmail}
+                    emailsParishers={selectedEmails}
                   />
                 </CustomDetails>
               )}

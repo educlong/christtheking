@@ -35,7 +35,6 @@ export default function PostConfigs({
   church,
   sendAnnouncement,
   emailsParishers,
-  allowSendEmail,
 }) {
   const churchOptions = [
     { label: 'All', value: -1 },
@@ -190,7 +189,7 @@ export default function PostConfigs({
       clone.link_id = isValidYouTubeId(possibleId) ? possibleId : null;
     }
     try {
-      if (!clone.id && allowSendEmail) {
+      if (!clone.id && emailsParishers.length >= 0) {
         if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
           alert('No recipients selected. Email not sent.');
         } else {
