@@ -31,6 +31,7 @@ export default function ParishersConfig({
   church,
   parishersData,
 }) {
+  console.log(parishersData);
   const { upsertInits, loading } = useUpsertInits();
   const [data, setData] = useState([]);
   const [headTable, setHeadTable] = useState([]);
@@ -54,7 +55,8 @@ export default function ParishersConfig({
   };
   const emptyParisher = () => ({
     id: `${Date.now()}-${uuidv4()}`,
-    fullname: '',
+    lastname: '',
+    firstname: '',
     parish: '',
     dob: '',
     baptism: '',
@@ -63,10 +65,12 @@ export default function ParishersConfig({
     maritalstatus: '',
     maritalday: '',
     address: '',
+    town: '',
+    pcode: '',
     phone: '',
     email: '',
     noenvelops: '',
-    whostax: '',
+    misc: '',
     is_delete: 0,
   });
 
@@ -124,6 +128,44 @@ export default function ParishersConfig({
   //   useEffect(() => {
   //     console.log('Data changed:', data);
   //   }, [data]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+
+  const handleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        // toggle direction
+        return { key, direction: prev.direction === 'asc' ? 'desc' : 'asc' };
+      }
+      return { key, direction: 'asc' };
+    });
+  };
+  const sortedData = useMemo(() => {
+    if (!sortConfig.key) return [...data];
+    return [...data].sort((a, b) => {
+      const aVal = a[sortConfig.key] ?? '';
+      const bVal = b[sortConfig.key] ?? '';
+      const aNum = !isNaN(aVal) && aVal !== '';
+      const bNum = !isNaN(bVal) && bVal !== '';
+      // Numeric comparison
+      if (aNum && bNum)
+        return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+      if (aNum && !bNum) return -1;
+      if (!aNum && bNum) return 1;
+      // String comparison
+      return sortConfig.direction === 'asc'
+        ? String(aVal).localeCompare(String(bVal))
+        : String(bVal).localeCompare(String(aVal));
+    });
+  }, [data, sortConfig]);
+  const parishColors = useMemo(() => {
+    const uniqueParish = [...new Set(data.map((p) => p.parish))];
+    const colors = ['#f1f1f1', '#FFCDD2', '#f2f277'];
+    const map = {};
+    uniqueParish.forEach((p, idx) => {
+      map[p] = colors[idx % colors.length];
+    });
+    return map;
+  }, [data]);
 
   return (
     <Box sx={{ mt: 4 }}>
@@ -153,22 +195,32 @@ export default function ParishersConfig({
         <Table sx={isShrink ? { width: isAdmin ? 3300 : 3000 } : undefined}>
           <TableHead sx={{ bgcolor: '#999aa3' }}>
             <TableRow>
+              {(isAdmin || isMod) && <TableCell>Edit</TableCell>}
               {headTable &&
                 headTable.length > 0 &&
                 headTable.map((h, idx) => {
                   const isEdge = idx === 0 || idx === headTable.length - 1;
                   if (isEdge && !isAdmin) return null;
+                  if (idx === 0) return null; // bỏ cột đầu (nếu cần)
                   return (
-                    idx !== 0 && <TableCell key={`${idx}-${h}`}>{h}</TableCell>
+                    <TableCell
+                      key={`${idx}-${h}`}
+                      onClick={() => handleSort(h.toLowerCase())} // map tên cột thành key
+                      sx={{ cursor: 'pointer', userSelect: 'none' }}
+                    >
+                      {h}
+                      {sortConfig.key === h.toLowerCase() &&
+                        (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽')}
+                    </TableCell>
                   );
                 })}
-              {(isAdmin || isMod) && <TableCell>Actions</TableCell>}
+              {(isAdmin || isMod) && <TableCell>Delete</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
-            {data &&
-              data.length > 0 &&
-              data.map((p, index) => {
+            {sortedData &&
+              sortedData.length > 0 &&
+              sortedData.map((p, index) => {
                 const isEditing = editingIndex === index;
                 return isMod && p.is_delete === 1 ? null : (
                   <TableRow
@@ -182,11 +234,28 @@ export default function ParishersConfig({
                           : '#fff2d9',
                     }}
                   >
+                    {(isAdmin || isMod) && (
+                      <TableCell>
+                        <IconButton
+                          color="primary"
+                          onClick={() => toggleEdit(index)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </TableCell>
+                    )}
                     <TableCellEdit
                       isEditing={isEditing}
-                      value={p.fullname}
+                      value={p.lastname}
                       onChange={(val) =>
-                        handleCellChange(index, 'fullname', val)
+                        handleCellChange(index, 'lastname', val)
+                      }
+                    />
+                    <TableCellEdit
+                      isEditing={isEditing}
+                      value={p.firstname}
+                      onChange={(val) =>
+                        handleCellChange(index, 'firstname', val)
                       }
                     />
                     <TableCellSelect
@@ -194,6 +263,9 @@ export default function ParishersConfig({
                       arr={churchOptions}
                       value={p.parish}
                       onChange={(val) => handleCellChange(index, 'parish', val)}
+                      sx={{
+                        backgroundColor: parishColors[p.parish] ?? 'inherit',
+                      }}
                     />
                     <TableCellEdit
                       isEditing={isEditing}
@@ -245,6 +317,16 @@ export default function ParishersConfig({
                     />
                     <TableCellEdit
                       isEditing={isEditing}
+                      value={p.town}
+                      onChange={(val) => handleCellChange(index, 'town', val)}
+                    />
+                    <TableCellEdit
+                      isEditing={isEditing}
+                      value={p.pcode}
+                      onChange={(val) => handleCellChange(index, 'pcode', val)}
+                    />
+                    <TableCellEdit
+                      isEditing={isEditing}
                       value={p.phone}
                       onChange={(val) => handleCellChange(index, 'phone', val)}
                     />
@@ -262,10 +344,8 @@ export default function ParishersConfig({
                     />
                     <TableCellEdit
                       isEditing={isEditing}
-                      value={p.whostax}
-                      onChange={(val) =>
-                        handleCellChange(index, 'whostax', val)
-                      }
+                      value={p.misc}
+                      onChange={(val) => handleCellChange(index, 'misc', val)}
                     />
                     {isAdmin && (
                       <TableCellEdit
@@ -278,12 +358,6 @@ export default function ParishersConfig({
                     )}
                     {(isAdmin || isMod) && (
                       <TableCell>
-                        <IconButton
-                          color="primary"
-                          onClick={() => toggleEdit(index)}
-                        >
-                          <EditIcon />
-                        </IconButton>
                         <IconButton
                           color="error"
                           onClick={() => handleDeleteParisher(index)}
@@ -320,8 +394,8 @@ const TableCellEdit = ({ isEditing, value, onChange }) => (
     )}
   </TableCell>
 );
-const TableCellSelect = ({ isEditing, arr = [], value, onChange }) => (
-  <TableCell>
+const TableCellSelect = ({ isEditing, arr = [], value, onChange, sx }) => (
+  <TableCell sx={sx}>
     {isEditing ? (
       <Select
         value={value ?? ''}

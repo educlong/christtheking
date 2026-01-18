@@ -46,30 +46,28 @@ const WeeklyBulletin = ({
   const handleUpload = async () => {
     if (!file) return;
     try {
-      if (emailsParishers.length > 0) {
-        if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
-          alert('No recipients selected. Email not sent.');
-        } else {
-          try {
-            await sendAnnouncement({
-              subject: bulletin,
-              message: `<br />${note}<br /><br />
+      if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
+        alert('No recipients selected. Email not sent.');
+      } else {
+        try {
+          await sendAnnouncement({
+            subject: bulletin,
+            message: `<br />${note.replace(/\n/g, '<br />')}<br /><br />
     <p>
       <a href="${backend}pdf/bulletin" target="_blank" style="color: blue; text-decoration: underline;">
-        ${file.name}
+        Weekly Bulletin: ${file.name}
       </a>
     </p>
     <p>More details in: <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
         ${website}
       </a></p>
   `,
-              emails: emailsParishers,
-              imgs: [],
-            });
-            alert('Emails sent successfully!');
-          } catch (err) {
-            console.error(err);
-          }
+            emails: emailsParishers,
+            imgs: [],
+          });
+          alert('Emails sent successfully!');
+        } catch (err) {
+          console.error(err);
         }
       }
     } finally {

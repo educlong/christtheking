@@ -15,7 +15,7 @@ export function LanguageButton({
   inits,
   anchorElLang,
   handleCloseLangMenu,
-  handleOpenLangMenu,
+  // handleOpenLangMenu,
 }) {
   const adsContact = JSON.parse(
     inits.find((item) => item.type === typeAds_info).data
@@ -40,7 +40,7 @@ export function LanguageButton({
         {/* 🔹 Nút Language */}
         <MenuItem
           sx={{ m: 0, p: 0, color: colorSub9Letter }}
-          onClick={handleOpenLangMenu}
+          // onClick={handleOpenLangMenu}
         >
           <MenuItemCustome
             custome={capitalize(languages.type)}

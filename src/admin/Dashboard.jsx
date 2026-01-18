@@ -308,25 +308,26 @@ export default function Dashboard({ auth, inits, posts, images }) {
             </CustomDetails>
             <CustomDetails>
               {Object.keys(emailsByParishers).map((parish) => (
-                <FormControlLabel
-                  key={parish}
-                  control={
-                    <Checkbox
-                      checked={selectedParishes.includes(parish)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setSelectedParishes((prev) => [...prev, parish]);
-                        } else {
-                          setSelectedParishes((prev) =>
-                            prev.filter((p) => p !== parish)
-                          );
-                        }
-                      }}
-                      color="primary"
-                    />
-                  }
-                  label={`Allow sending email for ${parish}`}
-                />
+                <div key={parish}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={selectedParishes.includes(parish)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedParishes((prev) => [...prev, parish]);
+                          } else {
+                            setSelectedParishes((prev) =>
+                              prev.filter((p) => p !== parish)
+                            );
+                          }
+                        }}
+                        color="primary"
+                      />
+                    }
+                    label={`Allow sending email for ${parish}`}
+                  />
+                </div>
               ))}
             </CustomDetails>
 
