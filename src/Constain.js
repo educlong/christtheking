@@ -9,7 +9,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 
 // backend
 export const backend = 'https://christ-the-king-backend.onrender.com/';
-export const website = 'http://localhost:5173/';
+export const website = 'christthekingclaresholm.com/';
 export const now = new Date(); // lấy thời gian hiện tại
 export const Homepage = 'HOME';
 // size của logo claresholm

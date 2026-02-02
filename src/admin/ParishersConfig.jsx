@@ -31,7 +31,6 @@ export default function ParishersConfig({
   church,
   parishersData,
 }) {
-  console.log(parishersData);
   const { upsertInits, loading } = useUpsertInits();
   const [data, setData] = useState([]);
   const [headTable, setHeadTable] = useState([]);
@@ -169,16 +168,6 @@ export default function ParishersConfig({
 
   return (
     <Box sx={{ mt: 4 }}>
-      <Box sx={{ mb: 2, width: '100%' }}>
-        <Button
-          sx={{ width: '100%' }}
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleAddParisher}
-        >
-          Add Parisher
-        </Button>
-      </Box>
       <Box sx={{ mb: 2 }}>
         <Button
           variant="outlined"
@@ -194,28 +183,13 @@ export default function ParishersConfig({
       <TableContainer component={Paper}>
         <Table sx={isShrink ? { width: isAdmin ? 3300 : 3000 } : undefined}>
           <TableHead sx={{ bgcolor: '#999aa3' }}>
-            <TableRow>
-              {(isAdmin || isMod) && <TableCell>Edit</TableCell>}
-              {headTable &&
-                headTable.length > 0 &&
-                headTable.map((h, idx) => {
-                  const isEdge = idx === 0 || idx === headTable.length - 1;
-                  if (isEdge && !isAdmin) return null;
-                  if (idx === 0) return null; // bỏ cột đầu (nếu cần)
-                  return (
-                    <TableCell
-                      key={`${idx}-${h}`}
-                      onClick={() => handleSort(h.toLowerCase())} // map tên cột thành key
-                      sx={{ cursor: 'pointer', userSelect: 'none' }}
-                    >
-                      {h}
-                      {sortConfig.key === h.toLowerCase() &&
-                        (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽')}
-                    </TableCell>
-                  );
-                })}
-              {(isAdmin || isMod) && <TableCell>Delete</TableCell>}
-            </TableRow>
+            <TableHeadParishers
+              isAdmin={isAdmin}
+              isMod={isMod}
+              headTable={headTable}
+              handleSort={handleSort}
+              sortConfig={sortConfig}
+            />
           </TableHead>
           <TableBody>
             {sortedData &&
@@ -370,8 +344,27 @@ export default function ParishersConfig({
                 );
               })}
           </TableBody>
+          <TableHead sx={{ bgcolor: '#999aa3' }}>
+            <TableHeadParishers
+              isAdmin={isAdmin}
+              isMod={isMod}
+              headTable={headTable}
+              handleSort={handleSort}
+              sortConfig={sortConfig}
+            />
+          </TableHead>
         </Table>
       </TableContainer>
+      <Box sx={{ mb: 2, width: '100%' }}>
+        <Button
+          sx={{ width: '100%' }}
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleAddParisher}
+        >
+          Add Parisher
+        </Button>
+      </Box>
       <ADConfigsSubmitBtn
         handleSubmit={handleSubmit}
         loading={loading}
@@ -413,4 +406,34 @@ const TableCellSelect = ({ isEditing, arr = [], value, onChange, sx }) => (
       value
     )}
   </TableCell>
+);
+const TableHeadParishers = ({
+  isAdmin,
+  isMod,
+  headTable,
+  handleSort,
+  sortConfig,
+}) => (
+  <TableRow>
+    {(isAdmin || isMod) && <TableCell>Edit</TableCell>}
+    {headTable &&
+      headTable.length > 0 &&
+      headTable.map((h, idx) => {
+        const isEdge = idx === 0 || idx === headTable.length - 1;
+        if (isEdge && !isAdmin) return null;
+        if (idx === 0) return null; // bỏ cột đầu (nếu cần)
+        return (
+          <TableCell
+            key={`${idx}-${h}`}
+            onClick={() => handleSort(h.toLowerCase())} // map tên cột thành key
+            sx={{ cursor: 'pointer', userSelect: 'none' }}
+          >
+            {h}
+            {sortConfig.key === h.toLowerCase() &&
+              (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽')}
+          </TableCell>
+        );
+      })}
+    {(isAdmin || isMod) && <TableCell>Delete</TableCell>}
+  </TableRow>
 );
