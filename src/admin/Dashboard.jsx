@@ -192,9 +192,10 @@ export default function Dashboard({ auth, inits, posts, images }) {
                   maxWPic={500}
                   maxHPic={500}
                   submit="Submit"
+                  isAdmin={isAdmin}
                 />
               )}
-              {isAdmin && (
+              {(isAdmin || isMod) && (
                 <Logos
                   inits={inits}
                   titleUpload="Add Ads"
@@ -209,7 +210,7 @@ export default function Dashboard({ auth, inits, posts, images }) {
               )}
               {images && images.length <= 0
                 ? ''
-                : isAdmin && (
+                : (isAdmin || isMod) && (
                     <AdsImg
                       images={images}
                       handleDelete={handleDelete}

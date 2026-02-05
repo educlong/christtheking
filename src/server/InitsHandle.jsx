@@ -114,7 +114,7 @@ export const useUpsertInits = () => {
   return { upsertInits, loading, error };
 };
 
-export const handleUploadPdf = async ({ file, type, setFile }) => {
+export const handleUploadPdf = async ({ file, type, position, setFile }) => {
   if (!file) return;
   if (file.type !== 'application/pdf') {
     alert('PDF File only');
@@ -123,6 +123,7 @@ export const handleUploadPdf = async ({ file, type, setFile }) => {
   const formData = new FormData();
   formData.append('pdf', file);
   formData.append('type', type);
+  formData.append('position', position);
   try {
     const res = await fetch(`${backend}pdf/upload`, {
       method: 'POST',

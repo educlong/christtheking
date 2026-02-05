@@ -16,7 +16,8 @@ const WeeklyBulletin = ({
   sendAnnouncement,
   emailsParishers,
 }) => {
-  const [file, setFile] = useState(null);
+  const MAX_FILES = 5;
+  const [_files, set_Files] = useState(Array(MAX_FILES).fill(null));
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState('');
   const bulletinInit = useMemo(
@@ -24,56 +25,81 @@ const WeeklyBulletin = ({
     [inits]
   );
   const bulletin = bulletinInit.length > 0 ? bulletinInit[0].data : '';
-  const handleFileChange = (e) => {
+  const handleFileChange = (e, _index) => {
     const selected = e.target.files[0];
     if (!selected) return;
     // Kiểm tra đúng PDF
     if (selected.type !== 'application/pdf') {
-      alert('Chỉ chấp nhận file PDF');
+      alert('PDF File only');
       e.target.value = null;
       return;
     }
     // Giới hạn dung lượng < 1MB
     const maxSize = 1 * 1024 * 1024; // 1MB
     if (selected.size > maxSize) {
-      alert('File quá lớn. Vui lòng chọn file dưới 1MB');
+      alert('File size must be less than 1MB');
       e.target.value = null;
       return;
     }
-    setFile(selected);
+    set_Files((prev) => {
+      const next = [...prev];
+      next[_index] = selected;
+      return next;
+    });
   };
 
   const handleUpload = async () => {
-    if (!file) return;
+    if (!_files) return;
+    // Phần này luôn chạy dù có alert hay lỗi
+    setLoading(true);
     try {
+      // 1️⃣ UPLOAD TẤT CẢ FILE
+      for (let i = 0; i < _files.length; i++) {
+        if (!_files[i]) continue;
+        await handleUploadPdf({
+          file: _files[i],
+          type,
+          position: i, // 🔥 QUAN TRỌNG
+          setFile: () => {},
+        });
+      }
+      // 2️⃣ CHECK EMAIL
       if (!Array.isArray(emailsParishers) || emailsParishers.length === 0) {
         alert('No recipients selected. Email not sent.');
-      } else {
-        try {
-          await sendAnnouncement({
-            subject: bulletin,
-            message: `<br />${note.replace(/\n/g, '<br />')}<br /><br />
-    <p>
-      <a href="${backend}pdf/bulletin" target="_blank" style="color: blue; text-decoration: underline;">
-        Weekly Bulletin: ${file.name}
-      </a>
-    </p>
+        return;
+      }
+      const fileLinksHtml = _files
+        .map((file, index) => {
+          if (!file) return '';
+          const pdfType = `${type}${index === 0 ? '' : index}`;
+          return `
+      <p>
+        <a href="${backend}pdf/${pdfType}" target="_blank"
+           style="color: blue; text-decoration: underline;">
+          ${file.name}
+        </a>
+      </p>
+    `;
+        })
+        .join('');
+      // 4️⃣ SEND EMAIL
+      await sendAnnouncement({
+        subject: bulletin,
+        message: `<br />${note.replace(/\n/g, '<br />')}<br /><br />
+        <div>Weekly Bulletin:</div>
+             ${fileLinksHtml}
     <p>More details in: <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
         ${website}
       </a></p>
   `,
-            emails: emailsParishers,
-            imgs: [],
-          });
-          alert('Emails sent successfully!');
-        } catch (err) {
-          console.error(err);
-        }
-      }
+        emails: emailsParishers,
+        imgs: [],
+      });
+      alert('Emails sent successfully!');
+    } catch (err) {
+      console.error(err);
+      alert('Upload or email failed');
     } finally {
-      // Phần này luôn chạy dù có alert hay lỗi
-      setLoading(true);
-      await handleUploadPdf({ file, type, setFile });
       setLoading(false);
       window.location.reload();
     }
@@ -92,25 +118,28 @@ const WeeklyBulletin = ({
       <Typography variant="h6" mb={2}>
         Upload {bulletin}
       </Typography>
+      {_files.map((_file, _index) => (
+        <Box key={_index} mb={2}>
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={(e) => handleFileChange(e, _index)}
+            style={{ display: 'none' }}
+            id={`pdf-input-${_index}`}
+          />
+          <label htmlFor={`pdf-input-${_index}`}>
+            <Button variant="contained" component="span">
+              Select file PDF
+            </Button>
+          </label>
 
-      <input
-        type="file"
-        accept="application/pdf"
-        onChange={handleFileChange}
-        style={{ display: 'none' }}
-        id="pdf-upload-input"
-      />
-      <label htmlFor="pdf-upload-input">
-        <Button variant="contained" component="span">
-          Select file PDF
-        </Button>
-      </label>
-
-      {file && (
-        <Typography variant="body1" mt={2}>
-          Selected file: {file.name}
-        </Typography>
-      )}
+          {_file && (
+            <Typography variant="body1" mt={2}>
+              Selected file: {_file.name}
+            </Typography>
+          )}
+        </Box>
+      ))}
       <TextField
         label="Message"
         fullWidth
@@ -124,10 +153,10 @@ const WeeklyBulletin = ({
         <Button
           variant="contained"
           color="primary"
-          disabled={!file || loading}
+          disabled={loading || _files.every((f) => !f)}
           onClick={handleUpload}
         >
-          {loading ? 'Đang upload...' : 'Upload'}
+          {loading ? 'Uploading...' : 'Upload'}
         </Button>
       </Box>
       <Box
@@ -135,6 +164,7 @@ const WeeklyBulletin = ({
           fontSize: 'x-small',
           fontWeight: 'bold',
           color: 'red',
+          mt: 1,
         }}
       >
         {notes}

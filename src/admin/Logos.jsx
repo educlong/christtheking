@@ -23,6 +23,7 @@ export default function Logos({
   maxWPic,
   maxHPic,
   submit,
+  isAdmin,
 }) {
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
@@ -103,7 +104,7 @@ export default function Logos({
           />
           {preview ? (
             <>
-              {!upload ? (
+              {!upload && isAdmin ? (
                 <FormControlLabel
                   control={<Checkbox />}
                   label="Change First Ad"
