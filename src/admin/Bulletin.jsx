@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -8,6 +8,10 @@ import {
 } from '@mui/material';
 import { handleUploadPdf } from '../server/InitsHandle';
 import { backend, typeBulletin, website } from '../Constain';
+import {
+  requestNotificationPermission,
+  showNotification,
+} from '../server/Notification';
 
 const WeeklyBulletin = ({
   inits,
@@ -24,6 +28,10 @@ const WeeklyBulletin = ({
     () => [inits.find((item) => item.type === typeBulletin)],
     [inits]
   );
+  useEffect(() => {
+    // Yêu cầu permission khi component mount
+    requestNotificationPermission();
+  }, []);
   const bulletin = bulletinInit.length > 0 ? bulletinInit[0].data : '';
   const handleFileChange = (e, _index) => {
     const selected = e.target.files[0];
@@ -96,6 +104,11 @@ const WeeklyBulletin = ({
         imgs: [],
       });
       alert('Emails sent successfully!');
+      // 4️⃣ Hiển thị notification desktop
+      showNotification('Weekly Bulletin Sent', {
+        body: `The Weekly Bulletin "${bulletin}" has been sent to ${emailsParishers.length} recipients. Please check your email [tab "Updates"] for details.`,
+        icon: '../../public/vite.svg', // bạn có thể thay bằng logo
+      });
     } catch (err) {
       console.error(err);
       alert('Upload or email failed');
@@ -119,7 +132,16 @@ const WeeklyBulletin = ({
         Upload {bulletin}
       </Typography>
       {_files.map((_file, _index) => (
-        <Box key={_index} mb={2}>
+        <Box
+          key={_index}
+          mb={2}
+          sx={{
+            border: '1px solid gray', // viền bao quanh
+            borderRadius: 2, // bo góc
+            p: 2, // padding bên trong
+            backgroundColor: '#f9f9f9', // nền nhạt cho dễ nhìn
+          }}
+        >
           <input
             type="file"
             accept="application/pdf"
@@ -130,7 +152,8 @@ const WeeklyBulletin = ({
           <label htmlFor={`pdf-input-${_index}`}>
             <Button variant="contained" component="span">
               Select file PDF
-            </Button>
+            </Button>{' '}
+            {_index === 0 ? '<= Main Weekly Bulletin' : ''}
           </label>
 
           {_file && (
