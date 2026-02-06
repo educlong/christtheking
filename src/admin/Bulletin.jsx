@@ -5,6 +5,7 @@ import {
   Typography,
   LinearProgress,
   TextField,
+  Stack,
 } from '@mui/material';
 import { handleUploadPdf } from '../server/InitsHandle';
 import { backend, typeBulletin, website } from '../Constain';
@@ -12,6 +13,7 @@ import {
   requestNotificationPermission,
   showNotification,
 } from '../server/Notification';
+import { useImageBase64Upload, AdsImg } from './AdminCustomes';
 
 const WeeklyBulletin = ({
   inits,
@@ -24,6 +26,7 @@ const WeeklyBulletin = ({
   const [_files, set_Files] = useState(Array(MAX_FILES).fill(null));
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState('');
+  const [images, setImages] = useState([]); // base64 images
   const bulletinInit = useMemo(
     () => [inits.find((item) => item.type === typeBulletin)],
     [inits]
@@ -55,6 +58,33 @@ const WeeklyBulletin = ({
       return next;
     });
   };
+  const { handleImageUpload } = useImageBase64Upload({
+    maxWidth: 2048,
+    quality: 0.8,
+    field: 'temp',
+  });
+  const handleAddImage = async (file) => {
+    const result = await handleImageUpload(
+      file,
+      0,
+      () => {} // 👈 fake setData
+    );
+    if (!result?.base64) return;
+
+    setImages((prev) => [...prev, result.base64]);
+  };
+
+  const handleDeleteImage = (_, idx) => {
+    setImages((prev) => prev.filter((_, i) => i !== idx));
+  };
+  const adsImages = useMemo(
+    () =>
+      images.map((base64, index) => ({
+        id: index, // fake id, chỉ để AdsImg dùng
+        base64,
+      })),
+    [images]
+  );
 
   const handleUpload = async () => {
     if (!_files) return;
@@ -92,21 +122,24 @@ const WeeklyBulletin = ({
         .join('');
       // 4️⃣ SEND EMAIL
       await sendAnnouncement({
-        subject: bulletin,
-        message: `<br />${note.replace(/\n/g, '<br />')}<br /><br />
-        <div>Weekly Bulletin:</div>
-             ${fileLinksHtml}
-    <p>More details in: <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
+        subject: 'This Week at Christ the King Parish',
+        message: `<p>I hope you are doing well. Here is the information for this week:</p>
+        ${note.replace(/\n/g, '<br />')}
+             <div>Note from the Parish Office:</div> ${fileLinksHtml}
+    <p>The information from <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
         ${website}
       </a></p>
+      <p>Please drag this email to your <strong>Primary</strong> tab to receive future messages here.</p>
+      <div>God bless you!</div>
   `,
         emails: emailsParishers,
-        imgs: [],
+        // emails: ['educlong@gmail.com', 'lloonnggg@gmail.com'],
+        imgs: images, // ✅ BASE64 IMAGES
       });
       alert('Emails sent successfully!');
       // 4️⃣ Hiển thị notification desktop
-      showNotification('Weekly Bulletin Sent', {
-        body: `The Weekly Bulletin "${bulletin}" has been sent to ${emailsParishers.length} recipients. Please check your email [tab "Updates"] for details.`,
+      showNotification('Message from Christ the King Parish', {
+        body: `The Message from Christ the King Parish "${bulletin}" has been sent to ${emailsParishers.length} recipients. Please check your email [tab "Updates"] for details.`,
         icon: '../../public/vite.svg', // bạn có thể thay bằng logo
       });
     } catch (err) {
@@ -172,6 +205,36 @@ const WeeklyBulletin = ({
         onChange={(e) => setNote(e.target.value)}
         sx={{ mt: 2 }}
       />
+      <Button
+        variant="contained"
+        component="label"
+        sx={{ textTransform: 'none', borderRadius: 2, mt: 2 }}
+      >
+        Choose Picture
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            await handleAddImage(file);
+            e.target.value = '';
+          }}
+        />
+      </Button>
+      {adsImages.length > 0 && (
+        <Stack direction="row" spacing={1} mt={2}>
+          <AdsImg
+            images={adsImages}
+            handleDelete={(_, idx) => handleDeleteImage(null, idx)}
+            size={80}
+            noChangeFirstImg
+            postIdx={-1}
+          />
+        </Stack>
+      )}
+
       <Box mt={2}>
         <Button
           variant="contained"

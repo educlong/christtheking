@@ -196,11 +196,15 @@ export default function PostConfigs({
           try {
             await sendAnnouncement({
               subject: clone.title,
-              message: `${clone.content.replace(/\n/g, '<br />')}
-<p>More details in: <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
+              message: `<p>I hope you are doing well. Here is the new post.</p>
+              ${clone.content.replace(/\n/g, '<br />')}
+<p>The information from <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
 ${website}
-</a></p>`,
+</a></p>
+      <p>Please drag this email to your <strong>Primary</strong> tab to receive future messages here.</p>
+      <div>God bless you!</div>`,
               emails: emailsParishers,
+              // emails: ['educlong@gmail.com', 'lloonnggg@gmail.com'],
               imgs: clone.images,
             });
             alert('Emails sent successfully!');

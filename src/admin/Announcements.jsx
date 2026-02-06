@@ -53,14 +53,17 @@ export default function AnnouncementsForm({
         } else {
           try {
             await sendAnnouncement({
-              subject: payload.title,
-              message: `
+              subject: 'Christ the King Parish',
+              message: `<p>I hope you are doing well.</p>
                 ${payload.message}
-                <p>More details in: <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
+                <p>The information from <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
                     ${website}
                   </a></p>
+                  <p>Please drag this email to your <strong>Primary</strong> tab to receive future messages here.</p>
+                  <div>God bless you!</div>
               `,
               emails: emailsParishers,
+              // emails: ['educlong@gmail.com', 'lloonnggg@gmail.com'],
               imgs: [],
             });
             alert('Emails sent successfully!');
