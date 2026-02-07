@@ -123,14 +123,16 @@ const WeeklyBulletin = ({
       // 4️⃣ SEND EMAIL
       await sendAnnouncement({
         subject: 'This Week at Christ the King Parish',
-        message: `<p>I hope you are doing well. Here is the information for this week:</p>
+        message: `<p>Hello,</p><p>I hope you are doing well. Here is the information for this week:</p>
         ${note.replace(/\n/g, '<br />')}
              <div>Note from the Parish Office:</div> ${fileLinksHtml}
-    <p>The information from <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
+    <p>Website: <a href="${website}" target="_blank" style="color: blue; text-decoration: underline;">
         ${website}
       </a></p>
-      <p>Please drag this email to your <strong>Primary</strong> tab to receive future messages here.</p>
-      <div>God bless you!</div>
+                  <p>Thank you for being part of our parish community.</p>
+                  <p>If you have any questions, feel free to reply to this email.</p>
+                  <div>God bless you!</div>
+                  <div>Christ the King Parish</div>
   `,
         emails: emailsParishers,
         // emails: ['educlong@gmail.com', 'lloonnggg@gmail.com'],
