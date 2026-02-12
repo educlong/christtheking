@@ -52,7 +52,7 @@ export default function PostConfigs({
           value: `${pageIndex}-${subIndex}`, // dùng cho Select
           pageIndex,
           subIndex,
-        }))
+        })),
     )
     .slice(0, -1);
   const { upsertPost, loading } = useUpsertPost();
@@ -62,7 +62,7 @@ export default function PostConfigs({
   const { cleanupImages } = useCleanupOldPostImages();
   const handleChange = (index, field, value) => {
     setPosts((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
     );
   };
   const handleDeleteImg = (postIdx, idx) => {
@@ -74,7 +74,7 @@ export default function PostConfigs({
           ...item,
           images: item.images.filter((_, index) => index !== idx),
         };
-      })
+      }),
     );
   };
   const toggleEdit = (index) => {
@@ -101,20 +101,45 @@ export default function PostConfigs({
     });
     setEditingIndex(0); // mở edit cho post mới thêm
   };
-  const { handleImageUpload } = useImageBase64Upload({
+  const uploadLow = useImageBase64Upload({
     maxWidth: 2048,
-    quality: 0,
-    field: 'temp', // field giả, KHÔNG dùng trực tiếp
+    quality: 0.1,
+    field: 'temp',
   });
+  const uploadMedium = useImageBase64Upload({
+    maxWidth: 2048,
+    quality: 0.15,
+    field: 'temp',
+  });
+  const uploadHigh = useImageBase64Upload({
+    maxWidth: 2048,
+    quality: 0.2,
+    field: 'temp',
+  });
+  // const { handleImageUpload } = useImageBase64Upload({
+  //   maxWidth: 2048,
+  //   quality: 0,
+  //   field: 'temp', // field giả, KHÔNG dùng trực tiếp
+  // });
   const handleAddPostImage = async (postIndex, file) => {
-    const result = await handleImageUpload(file, postIndex, setPosts);
+    if (!file) return;
+    const fileSizeMB = file.size / (1024 * 1024);
+    let handler;
+    if (fileSizeMB > 2) {
+      handler = uploadLow.handleImageUpload; // 0.1
+    } else if (fileSizeMB > 1) {
+      handler = uploadMedium.handleImageUpload; // 0.15
+    } else {
+      handler = uploadHigh.handleImageUpload; // 0.5
+    }
+    const result = await handler(file, postIndex, setPosts);
     if (!result?.base64) return;
     setPosts((prev) =>
       prev.map((post, i) =>
         i === postIndex
           ? { ...post, images: [...post.images, result.base64] }
-          : post
-      )
+          : post,
+      ),
     );
   };
   // utils youtube
@@ -138,7 +163,7 @@ export default function PostConfigs({
         // /embed/ID or /shorts/ID
         const paths = u.pathname.split('/');
         const embedIndex = paths.findIndex((p) =>
-          ['embed', 'shorts'].includes(p)
+          ['embed', 'shorts'].includes(p),
         );
         if (embedIndex !== -1 && paths[embedIndex + 1]) {
           return paths[embedIndex + 1];
@@ -152,7 +177,7 @@ export default function PostConfigs({
   };
   const handleDelete = async (post) => {
     const confirmDelete = window.confirm(
-      'Are you sure you want to delete this post?'
+      'Are you sure you want to delete this post?',
     );
     if (!confirmDelete) return;
     const clone = { ...post, is_delete: 1 };
@@ -328,7 +353,7 @@ ${website}
                               handleChange(
                                 index,
                                 'location',
-                                Number(e.target.value)
+                                Number(e.target.value),
                               )
                             }
                             postConfig

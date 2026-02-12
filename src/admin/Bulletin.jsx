@@ -29,7 +29,7 @@ const WeeklyBulletin = ({
   const [images, setImages] = useState([]); // base64 images
   const bulletinInit = useMemo(
     () => [inits.find((item) => item.type === typeBulletin)],
-    [inits]
+    [inits],
   );
   useEffect(() => {
     // Yêu cầu permission khi component mount
@@ -67,7 +67,7 @@ const WeeklyBulletin = ({
     const result = await handleImageUpload(
       file,
       0,
-      () => {} // 👈 fake setData
+      () => {}, // 👈 fake setData
     );
     if (!result?.base64) return;
 
@@ -83,7 +83,7 @@ const WeeklyBulletin = ({
         id: index, // fake id, chỉ để AdsImg dùng
         base64,
       })),
-    [images]
+    [images],
   );
 
   const handleUpload = async () => {
@@ -231,7 +231,7 @@ const WeeklyBulletin = ({
             images={adsImages}
             handleDelete={(_, idx) => handleDeleteImage(null, idx)}
             size={80}
-            noChangeFirstImg
+            noChangeFirstImg={false}
             postIdx={-1}
           />
         </Stack>
