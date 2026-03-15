@@ -1,3 +1,4 @@
+import heic2any from 'heic2any';
 import React, { useState } from 'react';
 import {
   Box,
@@ -101,6 +102,22 @@ export default function PostConfigs({
     });
     setEditingIndex(0); // mở edit cho post mới thêm
   };
+
+  async function convertHeic(file) {
+    if (file.type === 'image/heic' || file.name.endsWith('.heic')) {
+      const blob = await heic2any({
+        blob: file,
+        toType: 'image/jpeg',
+        quality: 0.9,
+      });
+
+      return new File([blob], file.name.replace('.heic', '.jpg'), {
+        type: 'image/jpeg',
+      });
+    }
+
+    return file;
+  }
   const uploadLow = useImageBase64Upload({
     maxWidth: 2048,
     quality: 0.1,
@@ -123,6 +140,7 @@ export default function PostConfigs({
   // });
   const handleAddPostImage = async (postIndex, file) => {
     if (!file) return;
+    file = await convertHeic(file); // ⭐ convert trước
     const fileSizeMB = file.size / (1024 * 1024);
     let handler;
     if (fileSizeMB > 2) {
