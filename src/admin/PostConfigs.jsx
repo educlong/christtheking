@@ -133,6 +133,11 @@ export default function PostConfigs({
     quality: 0.2,
     field: 'temp',
   });
+  const uploadUnchange = useImageBase64Upload({
+    maxWidth: 2048,
+    quality: 1,
+    field: 'temp',
+  });
   // const { handleImageUpload } = useImageBase64Upload({
   //   maxWidth: 2048,
   //   quality: 0,
@@ -147,8 +152,10 @@ export default function PostConfigs({
       handler = uploadLow.handleImageUpload; // 0.1
     } else if (fileSizeMB > 1) {
       handler = uploadMedium.handleImageUpload; // 0.15
+    } else if (fileSizeMB > 0.15) {
+      handler = uploadHigh.handleImageUpload; // 0.2
     } else {
-      handler = uploadHigh.handleImageUpload; // 0.5
+      handler = uploadUnchange.handleImageUpload; // 1
     }
     const result = await handler(file, postIndex, setPosts);
     if (!result?.base64) return;
