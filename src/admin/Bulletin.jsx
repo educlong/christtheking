@@ -45,10 +45,10 @@ const WeeklyBulletin = ({
       e.target.value = null;
       return;
     }
-    // Giới hạn dung lượng < 1MB
-    const maxSize = 1 * 1024 * 1024; // 1MB
+    // Giới hạn dung lượng < 2MB
+    const maxSize = 2 * 1024 * 1024; // 2MB
     if (selected.size > maxSize) {
-      alert('File size must be less than 1MB');
+      alert('File size must be less than 2MB');
       e.target.value = null;
       return;
     }
